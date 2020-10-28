@@ -28,23 +28,26 @@ import subprocess
 import sys
 
 
-__author__ = 'Daniel Lindsley'
-__license__ = 'New BSD'
+__author__ = "Daniel Lindsley"
+__license__ = "New BSD"
 __version__ = (1, 0, 1)
 
 
 class ShellException(Exception):
     """The base exception for all shell-related errors."""
+
     pass
 
 
 class MissingCommandException(ShellException):
     """Thrown when no command was setup."""
+
     pass
 
 
 class CommandError(ShellException):
     """Thrown when a command fails."""
+
     def __init__(self, message, code, stderr):
         self.message = message
         self.code = code
@@ -80,8 +83,16 @@ class Shell(object):
     If set to ``True``, prints stdout to stdout and stderr to stderr as
     execution happens. (Default: ``False``)
     """
-    def __init__(self, has_input=False, record_output=True, record_errors=True,
-                 strip_empty=True, die=False, verbose=False):
+
+    def __init__(
+        self,
+        has_input=False,
+        record_output=True,
+        record_errors=True,
+        strip_empty=True,
+        die=False,
+        verbose=False,
+    ):
         self.has_input = has_input
         self.record_output = record_output
         self.record_errors = record_errors
@@ -89,13 +100,13 @@ class Shell(object):
         self.die = die
         self.verbose = verbose
 
-        self.last_command = ''
-        self.line_breaks = '\n'
+        self.last_command = ""
+        self.line_breaks = "\n"
         self.pid = None
         self.code = 0
         self._popen = None
-        self._stdout = ''
-        self._stderr = ''
+        self._stdout = ""
+        self._stderr = ""
 
     def _split_command(self, command):
         """
@@ -149,9 +160,10 @@ class Shell(object):
 
         if self.die and self.code != 0:
             raise CommandError(
-                message='Command exited with code {}'.format(self.code),
+                message="Command exited with code {}".format(self.code),
                 code=self.code,
-                stderr=stderr)
+                stderr=stderr,
+            )
 
     def run(self, command):
         """
@@ -173,18 +185,15 @@ class Shell(object):
         self.last_command = command
         command_bits = self._split_command(command)
         kwargs = {
-            'stdout': subprocess.PIPE,
-            'stderr': subprocess.PIPE,
-            'universal_newlines': True,
+            "stdout": subprocess.PIPE,
+            "stderr": subprocess.PIPE,
+            "universal_newlines": True,
         }
 
         if self.has_input:
-            kwargs['stdin'] = subprocess.PIPE
+            kwargs["stdin"] = subprocess.PIPE
 
-        self._popen = subprocess.Popen(
-            command_bits,
-            **kwargs
-        )
+        self._popen = subprocess.Popen(command_bits, **kwargs)
         self.pid = self._popen.pid
 
         if not self.has_input:
@@ -303,8 +312,15 @@ class Shell(object):
         return lines
 
 
-def shell(command, has_input=False, record_output=True, record_errors=True,
-          strip_empty=True, die=False, verbose=False):
+def shell(
+    command,
+    has_input=False,
+    record_output=True,
+    record_errors=True,
+    strip_empty=True,
+    die=False,
+    verbose=False,
+):
     """
     A convenient shortcut for running commands.
 
@@ -352,6 +368,6 @@ def shell(command, has_input=False, record_output=True, record_errors=True,
         record_errors=record_errors,
         strip_empty=strip_empty,
         die=die,
-        verbose=verbose
+        verbose=verbose,
     )
     return sh.run(command)
