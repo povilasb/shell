@@ -23,14 +23,19 @@ If you need to extend the behavior, you can also use the ``Shell`` object::
     ['Hello, world!']
 
 """
+from typing import Union, Optional
 import shlex
 import subprocess
 import sys
+import os
 
 
 __author__ = "Daniel Lindsley"
 __license__ = "New BSD"
 __version__ = (1, 0, 1)
+
+
+PathTypes = Union[str, bytes, os.PathLike]
 
 
 class ShellException(Exception):
@@ -92,6 +97,7 @@ class Shell(object):
         strip_empty=True,
         die=False,
         verbose=False,
+        cwd: Optional[PathTypes] = None,
     ):
         self.has_input = has_input
         self.record_output = record_output
@@ -104,6 +110,7 @@ class Shell(object):
         self.line_breaks = "\n"
         self.pid = None
         self.code = 0
+        self.cwd = cwd
         self._popen = None
         self._stdout = ""
         self._stderr = ""
@@ -188,6 +195,7 @@ class Shell(object):
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
             "universal_newlines": True,
+            "cwd": self.cwd,
         }
 
         if self.has_input:
@@ -320,6 +328,7 @@ def shell(
     strip_empty=True,
     die=False,
     verbose=False,
+    cwd: Optional[PathTypes] = None,
 ):
     """
     A convenient shortcut for running commands.
@@ -369,5 +378,6 @@ def shell(
         strip_empty=strip_empty,
         die=die,
         verbose=verbose,
+        cwd=cwd,
     )
     return sh.run(command)
